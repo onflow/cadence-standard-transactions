@@ -1,32 +1,24 @@
-package template
+package transactions
 
 import "strings"
 
 type Label = string
 
-type Parameters = []uint64
-
-type TransactionBody string
-
-type TransactionEdit struct {
-	PrepareBlock      string
-	ExecuteBlock      string
-	FieldDeclarations string
-}
-
-type Template interface {
+type Transaction interface {
 	Name() string
 	Label() Label
 
-	// Cardinality returns the number of parameters that this template has
-	Cardinality() uint
+	SetPrepareBlock(prepareBlock string) *SimpleTransaction
+	SetExecuteBlock(executeBlock string) *SimpleTransaction
+	SetFieldDeclarations(fieldDeclarations string) *SimpleTransaction
 
-	TransactionEditFunc(parameters Parameters) (TransactionEdit, error)
-	InitialParameters() Parameters
+	GetPrepareBlock() string
+	GetExecuteBlock() string
+	GetFieldDeclarations() string
 }
 
 type Registry interface {
-	Get(label Label) (Template, error)
+	Get(label Label) (Transaction, error)
 	AllLabels() []Label
 }
 
