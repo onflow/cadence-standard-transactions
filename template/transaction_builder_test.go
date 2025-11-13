@@ -28,7 +28,7 @@ func Test_TransactionNew(t *testing.T) {
 func Test_TransactionBuilder(t *testing.T) {
 	t.Parallel()
 
-	reg := registry.Global.Clone()
+	reg := registry.SimpleRegistry.Clone()
 
 	require.NotEmpty(t, reg.AllLabels())
 

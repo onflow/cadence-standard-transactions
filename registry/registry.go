@@ -69,20 +69,25 @@ func (r Registry) AllLabels() []template.Label {
 	return labels
 }
 
-var Global Registry
+var SimpleRegistry Registry
+var ContractRegistry Registry
+var ScheduledRegistry Registry
 
 func init() {
-	Global = NewRegistry()
-	err := Global.RegisterAll(SimpleTemplates)
+	SimpleRegistry = NewRegistry()
+	ContractRegistry = NewRegistry()
+	ScheduledRegistry = NewRegistry()
+
+	err := SimpleRegistry.RegisterAll(SimpleTemplates)
 	if err != nil {
 		panic(err)
 	}
-	err = Global.RegisterAll(ContractTemplates)
+	err = ContractRegistry.RegisterAll(ContractTemplates)
 	if err != nil {
 		panic(err)
 	}
 
-	err = Global.RegisterAll(ScheduledTransactions)
+	err = ScheduledRegistry.RegisterAll(ScheduledTransactions)
 	if err != nil {
 		panic(err)
 	}
