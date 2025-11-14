@@ -35,8 +35,6 @@ const scheduleTemplate = `
 
 var ScheduledTransactionAndExecuteTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"scheduled transaction and execute",
-		"ST",
 		loopLength,
 		fmt.Sprintf(scheduleTemplate, `
 				let fees <- vault.withdraw(amount: 0.003) as! @FlowToken.Vault
@@ -50,8 +48,6 @@ var ScheduledTransactionAndExecuteTransaction = func(loopLength uint64) *SimpleT
 
 var ScheduledTransactionAndExecuteWithLargeDataTransaction = func(loopLength uint64, dataSize uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"scheduled transaction and execute with large data",
-		"STLD",
 		loopLength,
 		fmt.Sprintf(scheduleTemplate, fmt.Sprintf(`
 			let fees <- vault.withdraw(amount: 0.11) as! @FlowToken.Vault
@@ -65,8 +61,6 @@ var ScheduledTransactionAndExecuteWithLargeDataTransaction = func(loopLength uin
 
 var ScheduledTransactionAndExecuteWithLargeArrayTransaction = func(loopLength uint64, arraySize uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"scheduled transaction and execute with large array",
-		"STLA",
 		loopLength,
 		fmt.Sprintf(scheduleTemplate, fmt.Sprintf(`
 			let largeArray: [Int] = []

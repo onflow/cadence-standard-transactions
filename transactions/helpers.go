@@ -38,14 +38,10 @@ func stringDictOfLen(dictLen uint64, stringLen uint64) string {
 }
 
 func simpleTransactionWithLoop(
-	name string,
-	label Label,
 	initialLoopLength uint64,
 	body string,
 ) *SimpleTransaction {
 	return NewSimpleTransaction(
-		name,
-		label,
-	).
-		SetPrepareBlock(LoopTemplate(initialLoopLength, body))
+		LoopTemplate(initialLoopLength, body),
+	)
 }

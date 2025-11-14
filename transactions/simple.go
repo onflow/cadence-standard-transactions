@@ -15,8 +15,6 @@ import (
 
 var EmptyLoopTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"empty loop",
-		"EL",
 		loopLength,
 		"",
 	)
@@ -24,8 +22,6 @@ var EmptyLoopTransaction = func(loopLength uint64) *SimpleTransaction {
 
 var AssertTrueTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"assert true",
-		"Assert",
 		loopLength,
 		"assert(true)",
 	)
@@ -33,8 +29,6 @@ var AssertTrueTransaction = func(loopLength uint64) *SimpleTransaction {
 
 var GetSignerAddressTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"get signer address",
-		"GSA",
 		loopLength,
 		"signer.address",
 	)
@@ -42,8 +36,6 @@ var GetSignerAddressTransaction = func(loopLength uint64) *SimpleTransaction {
 
 var GetSignerPublicAccountTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"get signer public account",
-		"GSAcc",
 		loopLength,
 		"getAccount(signer.address)",
 	)
@@ -51,8 +43,6 @@ var GetSignerPublicAccountTransaction = func(loopLength uint64) *SimpleTransacti
 
 var GetSignerAccountBalanceTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"get signer account balance",
-		"GSAccBal",
 		loopLength,
 		"signer.balance",
 	)
@@ -60,8 +50,6 @@ var GetSignerAccountBalanceTransaction = func(loopLength uint64) *SimpleTransact
 
 var GetSignerAccountAvailableBalanceTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"get signer account available balance",
-		"GSAccAwBal",
 		loopLength,
 		"signer.availableBalance",
 	)
@@ -69,8 +57,6 @@ var GetSignerAccountAvailableBalanceTransaction = func(loopLength uint64) *Simpl
 
 var GetSignerAccountStorageUsedTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"get signer account storage used",
-		"GSAccSU",
 		loopLength,
 		"signer.storage.used",
 	)
@@ -78,8 +64,6 @@ var GetSignerAccountStorageUsedTransaction = func(loopLength uint64) *SimpleTran
 
 var GetSignerAccountStorageCapacityTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"get signer account storage capacity",
-		"GSAccSC",
 		loopLength,
 		"signer.storage.capacity",
 	)
@@ -87,8 +71,6 @@ var GetSignerAccountStorageCapacityTransaction = func(loopLength uint64) *Simple
 
 var BorrowSignerAccountFlowTokenVaultTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"borrow signer account FlowToken.Vault",
-		"BFTV",
 		loopLength,
 		"let vaultRef = signer.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(from: /storage/flowTokenVault)!",
 	)
@@ -96,8 +78,6 @@ var BorrowSignerAccountFlowTokenVaultTransaction = func(loopLength uint64) *Simp
 
 var BorrowSignerAccountFungibleTokenReceiverTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"borrow signer account FungibleToken.Receiver",
-		"BFR",
 		loopLength,
 		`
 			let receiverRef = getAccount(signer.address)
@@ -108,8 +88,6 @@ var BorrowSignerAccountFungibleTokenReceiverTransaction = func(loopLength uint64
 
 var TransferTokensToSelfTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"transfer tokens to self",
-		"TTS",
 		loopLength,
 		`
 			let vaultRef = signer.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(from: /storage/flowTokenVault)!
@@ -123,8 +101,6 @@ var TransferTokensToSelfTransaction = func(loopLength uint64) *SimpleTransaction
 
 var CreateNewAccountTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"create new account",
-		"CA",
 		loopLength,
 		"let acct = Account(payer: signer)",
 	)
@@ -132,8 +108,6 @@ var CreateNewAccountTransaction = func(loopLength uint64) *SimpleTransaction {
 
 var CreateNewAccountWithContractTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"create new account with contract",
-		"CAWC",
 		loopLength,
 		`
 			let acct = Account(payer: signer)
@@ -144,8 +118,6 @@ var CreateNewAccountWithContractTransaction = func(loopLength uint64) *SimpleTra
 
 var DecodeHexTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"decode hex",
-		"HEX",
 		loopLength,
 		`"f847b84000fb479cb398ab7e31d6f048c12ec5b5b679052589280cacde421af823f93fe927dfc3d1e371b172f97ceeac1bc235f60654184c83f4ea70dd3b7785ffb3c73802038203e8".decodeHex()`,
 	)
@@ -153,8 +125,6 @@ var DecodeHexTransaction = func(loopLength uint64) *SimpleTransaction {
 
 var RevertibleRandomTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"revertible random",
-		"RR",
 		loopLength,
 		`revertibleRandom<UInt64>(modulo: UInt64(100))`,
 	)
@@ -162,8 +132,6 @@ var RevertibleRandomTransaction = func(loopLength uint64) *SimpleTransaction {
 
 var NumberToStringConversionTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"number to string conversion",
-		"TS",
 		loopLength,
 		`i.toString()`,
 	)
@@ -171,8 +139,6 @@ var NumberToStringConversionTransaction = func(loopLength uint64) *SimpleTransac
 
 var ConcatenateStringTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"concatenate string",
-		"CS",
 		loopLength,
 		`"x".concat(i.toString())`,
 	)
@@ -180,10 +146,7 @@ var ConcatenateStringTransaction = func(loopLength uint64) *SimpleTransaction {
 
 // needs a string in storage
 var BorrowStringTransaction = NewSimpleTransaction(
-	"borrow string",
-	"ABrSt",
-).
-	SetPrepareBlock(`
+	`
 		let strings = signer.storage.borrow<&[String]>(from: /storage/ABrSt)!
 		var i = 0
 		var lenSum = 0
@@ -191,13 +154,11 @@ var BorrowStringTransaction = NewSimpleTransaction(
 			lenSum = lenSum + strings[i].length
 			i = i + 1
 		}
-	`)
+	`,
+)
 
 var CopyStringTransaction = NewSimpleTransaction(
-	"copy string",
-	"ACpSt",
-).
-	SetPrepareBlock(`
+	`
 		let strings = signer.storage.copy<[String]>(from: /storage/ACpSt)!
 		var i = 0
 		var lenSum = 0
@@ -205,13 +166,11 @@ var CopyStringTransaction = NewSimpleTransaction(
 			lenSum = lenSum + strings[i].length
 			i = i + 1
 		}
-	`)
+	`,
+)
 
 var CopyStringAndSaveADuplicateTransaction = NewSimpleTransaction(
-	"copy string and save a duplicate",
-	"ACpStSv",
-).
-	SetPrepareBlock(`
+	`
 		let strings = signer.storage.copy<[String]>(from: /storage/ACpStSv)!
 		var i = 0
 		var lenSum = 0
@@ -220,61 +179,54 @@ var CopyStringAndSaveADuplicateTransaction = NewSimpleTransaction(
 			i = i + 1
 		}
 		signer.storage.save(strings, to: /storage/ACpStSv2)
-	`)
+	`,
+)
 
 var StoreAndLoadDictStringTransaction = func(dictLen uint64) *SimpleTransaction {
 	return NewSimpleTransaction(
-		"store and load dict string",
-		"AStDSt",
-	).
-		SetPrepareBlock(fmt.Sprintf(`
-		signer.storage.save<{String: String}>(%s, to: /storage/AStDSt)
-		signer.storage.load<{String: String}>(from: /storage/AStDSt)
-	`, stringDictOfLen(dictLen, 75)))
+		fmt.Sprintf(
+			`
+				signer.storage.save<{String: String}>(%s, to: /storage/AStDSt)
+				signer.storage.load<{String: String}>(from: /storage/AStDSt)
+			`,
+			stringDictOfLen(dictLen, 75),
+		),
+	)
 }
 
 var StoreLoadAndDestroyDictStringTransaction = NewSimpleTransaction(
-	"store load and destroy dict string",
-	"ALdDStD",
-).
-	SetPrepareBlock(`
+	`
 		let strings = signer.storage.load<{String: String}>(from: /storage/ALdDStD)!
 		for key in strings.keys {
 			strings.remove(key: key)
 		}
-	`)
+	`,
+)
 
 var BorrowDictStringTransaction = NewSimpleTransaction(
-	"borrow dict string",
-	"ABrDSt",
-).
-	SetPrepareBlock(`
+	`
 		let strings = signer.storage.borrow<&{String: String}>(from: /storage/ABrDSt)!
 		var lenSum = 0
 		strings.forEachKey(fun (key: String): Bool {
 			lenSum = lenSum + strings[key]!.length
 			return true
 		})
-	`)
+	`,
+)
 
 var CopyDictStringTransaction = NewSimpleTransaction(
-	"copy dict string",
-	"ACpDSt",
-).
-	SetPrepareBlock(`
+	`
 		let strings = signer.storage.copy<{String: String}>(from: /storage/ACpDSt)!
 		var lenSum = 0
 		strings.forEachKey(fun (key: String): Bool {
 			lenSum = lenSum + strings[key]!.length
 			return true
 		})
-	`)
+	`,
+)
 
 var CopyDictStringAndSaveADuplicateTransaction = NewSimpleTransaction(
-	"copy dict string and save a duplicate",
-	"ACpDStSv",
-).
-	SetPrepareBlock(`
+	`
 		let strings = signer.storage.copy<{String: String}>(from: /storage/ACpDStSv)!
 		var lenSum = 0
 		strings.forEachKey(fun (key: String): Bool {
@@ -282,21 +234,18 @@ var CopyDictStringAndSaveADuplicateTransaction = NewSimpleTransaction(
 			return true
 		})
 		signer.storage.save(strings, to: /storage/ACpDStSv2)
-	`)
+	`,
+)
 
 var LoadDictAndDestroyItTransaction = NewSimpleTransaction(
-	"load dict and destroy it",
-	"DestDict",
-).
-	SetPrepareBlock(`
+	`
 		let r <- signer.storage.load<@{String: AnyResource}>(from: /storage/DestDict)!
 		destroy r
-	`)
+	`,
+)
 
 var AddKeyToAccountTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"add key to account",
-		"KA",
 		loopLength,
 		`
 				let key = PublicKey(
@@ -315,8 +264,6 @@ var AddKeyToAccountTransaction = func(loopLength uint64) *SimpleTransaction {
 
 var AddAndRevokeKeyToAccountTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"add and revoke key to account",
-		"KAR",
 		loopLength,
 		`
 				let key = PublicKey(
@@ -336,8 +283,6 @@ var AddAndRevokeKeyToAccountTransaction = func(loopLength uint64) *SimpleTransac
 
 var GetAccountKeyTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"get account key",
-		"KGet",
 		loopLength,
 		`
 				let key = signer.keys.get(keyIndex: 0)
@@ -347,8 +292,6 @@ var GetAccountKeyTransaction = func(loopLength uint64) *SimpleTransaction {
 
 var GetContractsTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"get contracts",
-		"GetCon",
 		loopLength,
 		`signer.contracts.names`,
 	)
@@ -356,8 +299,6 @@ var GetContractsTransaction = func(loopLength uint64) *SimpleTransaction {
 
 var HashTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"hash",
-		"H",
 		loopLength,
 		`Crypto.hash("%s".utf8, algorithm: HashAlgorithm.SHA2_256)`,
 	)
@@ -365,8 +306,6 @@ var HashTransaction = func(loopLength uint64) *SimpleTransaction {
 
 var StringToLowerTransaction = func(loopLength uint64, stringLen uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"string to lower",
-		"STL",
 		loopLength,
 		fmt.Sprintf(`
 			var s = "%s"
@@ -377,8 +316,6 @@ var StringToLowerTransaction = func(loopLength uint64, stringLen uint64) *Simple
 
 var GetCurrentBlockTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"get current block",
-		"GCB",
 		loopLength,
 		`getCurrentBlock()`,
 	)
@@ -386,8 +323,6 @@ var GetCurrentBlockTransaction = func(loopLength uint64) *SimpleTransaction {
 
 var GetBlockAtTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"get block at",
-		"GBA",
 		loopLength,
 		`let at = getCurrentBlock().height
 		getBlock(at: at)`,
@@ -396,8 +331,6 @@ var GetBlockAtTransaction = func(loopLength uint64) *SimpleTransaction {
 
 var DestroyResourceDictionaryTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"destroy resource dictionary",
-		"DRD",
 		loopLength,
 		`let r: @{String: AnyResource} <- {}
 		destroy r`,
@@ -406,8 +339,6 @@ var DestroyResourceDictionaryTransaction = func(loopLength uint64) *SimpleTransa
 
 var ParseUFix64Transaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"parse UFix64",
-		"PUFix",
 		loopLength,
 		`let smol: UFix64? = UFix64.fromString("0.123456")`,
 	)
@@ -415,8 +346,6 @@ var ParseUFix64Transaction = func(loopLength uint64) *SimpleTransaction {
 
 var ParseFix64Transaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"parse Fix64",
-		"PFix",
 		loopLength,
 		`let smol: Fix64? = Fix64.fromString("-0.123456")`,
 	)
@@ -424,8 +353,6 @@ var ParseFix64Transaction = func(loopLength uint64) *SimpleTransaction {
 
 var ParseUInt64Transaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"parse UInt64",
-		"PUInt64",
 		loopLength,
 		`let smol: UInt64? = UInt64.fromString("123456")`,
 	)
@@ -433,8 +360,6 @@ var ParseUInt64Transaction = func(loopLength uint64) *SimpleTransaction {
 
 var ParseInt64Transaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"parse Int64",
-		"PInt64",
 		loopLength,
 		`let smol: Int64? = Int64.fromString("-123456")`,
 	)
@@ -442,8 +367,6 @@ var ParseInt64Transaction = func(loopLength uint64) *SimpleTransaction {
 
 var ParseIntTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"parse Int",
-		"PInt",
 		loopLength,
 		`let smol: Int? = Int.fromString("-12345")`,
 	)
@@ -451,8 +374,6 @@ var ParseIntTransaction = func(loopLength uint64) *SimpleTransaction {
 
 var IssueStorageCapabilityTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"issue storage capability",
-		"ISCap",
 		loopLength,
 		`let cap = signer.capabilities.storage.issue<&Int>(/storage/foo)`,
 	)
@@ -460,8 +381,6 @@ var IssueStorageCapabilityTransaction = func(loopLength uint64) *SimpleTransacti
 
 var GetKeyCountTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"Get key count",
-		"GKC",
 		loopLength,
 		`let count = signer.keys.count`,
 	)
@@ -487,8 +406,6 @@ var CreateKeyECDSAP256Transaction = func(loopLength uint64) *SimpleTransaction {
 	`, key)
 
 	return simpleTransactionWithLoop(
-		"Create Key ECDSA_P256",
-		"CrKeyP256",
 		loopLength,
 		body,
 	)
@@ -496,8 +413,6 @@ var CreateKeyECDSAP256Transaction = func(loopLength uint64) *SimpleTransaction {
 
 var CreateKeyEDCSAsecp256k1Transaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"Create Key ECDSA_secp256k1",
-		"CrKeysecp256k1",
 		loopLength,
 		`
 			let publicKey = PublicKey(
@@ -510,8 +425,6 @@ var CreateKeyEDCSAsecp256k1Transaction = func(loopLength uint64) *SimpleTransact
 
 var CreateKeyBLSBLS12381Transaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
-		"Create Key BLS_BLS12_381",
-		"CrKeyBLS",
 		loopLength,
 		`
 			let publicKey = PublicKey(
@@ -536,10 +449,8 @@ var ArrayInsertTransaction = func(loopLength uint64) *SimpleTransaction {
 	)
 
 	return NewSimpleTransaction(
-		"Array insert",
-		"ArrIns",
-	).
-		SetPrepareBlock(body)
+		body,
+	)
 }
 
 var ArrayInsertRemoveTransaction = func(loopLength uint64) *SimpleTransaction {
@@ -557,10 +468,8 @@ var ArrayInsertRemoveTransaction = func(loopLength uint64) *SimpleTransaction {
 	)
 
 	return NewSimpleTransaction(
-		"Array insert remove",
-		"ArrInsDel",
-	).
-		SetPrepareBlock(body)
+		body,
+	)
 }
 
 var ArrayInsertSetRemoveTransaction = func(loopLength uint64) *SimpleTransaction {
@@ -579,10 +488,8 @@ var ArrayInsertSetRemoveTransaction = func(loopLength uint64) *SimpleTransaction
 	)
 
 	return NewSimpleTransaction(
-		"Array insert set remove",
-		"ArrInsSetDel",
-	).
-		SetPrepareBlock(body)
+		body,
+	)
 }
 
 var ArrayInsertMapTransaction = func(loopLength uint64) *SimpleTransaction {
@@ -604,10 +511,8 @@ var ArrayInsertMapTransaction = func(loopLength uint64) *SimpleTransaction {
 	)
 
 	return NewSimpleTransaction(
-		"Array insert map",
-		"ArrInsMap",
-	).
-		SetPrepareBlock(body)
+		body,
+	)
 }
 
 var ArrayInsertFilterTransaction = func(loopLength uint64) *SimpleTransaction {
@@ -628,10 +533,8 @@ var ArrayInsertFilterTransaction = func(loopLength uint64) *SimpleTransaction {
 		),
 	)
 	return NewSimpleTransaction(
-		"Array insert filter",
-		"ArrInsFilt",
-	).
-		SetPrepareBlock(body)
+		body,
+	)
 }
 
 var DictInsertTransaction = func(loopLength uint64) *SimpleTransaction {
@@ -648,10 +551,8 @@ var DictInsertTransaction = func(loopLength uint64) *SimpleTransaction {
 	)
 
 	return NewSimpleTransaction(
-		"Dict insert",
-		"DictIns",
-	).
-		SetPrepareBlock(body)
+		body,
+	)
 }
 
 var DictInsertRemoveTransaction = func(loopLength uint64) *SimpleTransaction {
@@ -669,10 +570,8 @@ var DictInsertRemoveTransaction = func(loopLength uint64) *SimpleTransaction {
 	)
 
 	return NewSimpleTransaction(
-		"Dict insert remove",
-		"DictInsDel",
-	).
-		SetPrepareBlock(body)
+		body,
+	)
 }
 
 var DictInsertSetRemoveTransaction = func(loopLength uint64) *SimpleTransaction {
@@ -691,10 +590,8 @@ var DictInsertSetRemoveTransaction = func(loopLength uint64) *SimpleTransaction 
 	)
 
 	return NewSimpleTransaction(
-		"Dict insert set remove",
-		"DictInsSetDel",
-	).
-		SetPrepareBlock(body)
+		body,
+	)
 }
 
 var DictIterCopyTransaction = func(loopLength uint64) *SimpleTransaction {
@@ -716,10 +613,8 @@ var DictIterCopyTransaction = func(loopLength uint64) *SimpleTransaction {
 	)
 
 	return NewSimpleTransaction(
-		"Dict iter copy",
-		"DictIterCopy",
-	).
-		SetPrepareBlock(body)
+		body,
+	)
 }
 
 var ArrayCreateBatchTransaction = func(loopLength uint64) *SimpleTransaction {
@@ -737,10 +632,8 @@ var ArrayCreateBatchTransaction = func(loopLength uint64) *SimpleTransaction {
 			`, sumStr)
 
 	return NewSimpleTransaction(
-		"Array Create Batch",
-		"ArrCB",
-	).
-		SetPrepareBlock(body)
+		body,
+	)
 }
 
 var VerifySignatureTransaction = func(numKeys uint64, signatures []string) *SimpleTransaction {
@@ -818,22 +711,19 @@ var VerifySignatureTransaction = func(numKeys uint64, signatures []string) *Simp
 					panic("invalid signature")
 				}
 				
-				
-	`, keyListAdd, signaturesAdd, hex.EncodeToString(message))
+			`, keyListAdd, signaturesAdd, hex.EncodeToString(message))
 
 	return NewSimpleTransaction(
-		"Verify signature",
-		"VerSig",
-	).
-		SetPrepareBlock(body)
+		body,
+	)
 }
 
 var AggregateBLSAggregateSignatureTransaction = func(numSigs int, sigs []string) *SimpleTransaction {
 	signatures := ""
 	for i := 0; i < numSigs; i++ {
 		signatures += fmt.Sprintf(`
-				signatures.append("%s".decodeHex())
-			`, sigs[i])
+						signatures.append("%s".decodeHex())
+					`, sigs[i])
 	}
 
 	body := fmt.Sprintf(`
@@ -843,10 +733,8 @@ var AggregateBLSAggregateSignatureTransaction = func(numSigs int, sigs []string)
 	`, signatures)
 
 	return NewSimpleTransaction(
-		"Aggregate BLS aggregate signature",
-		"BLSAggSig",
-	).
-		SetPrepareBlock(body)
+		body,
+	)
 }
 
 var AggregateBLSAggregateKeysTransaction = func(numSigs int) *SimpleTransaction {
@@ -875,11 +763,11 @@ var AggregateBLSAggregateKeysTransaction = func(numSigs int) *SimpleTransaction 
 	pkString := ""
 	for i := 0; i < numSigs; i++ {
 		pkString += fmt.Sprintf(`
-				pks.append(PublicKey(
-					publicKey: "%s".decodeHex(), 
-					signatureAlgorithm: SignatureAlgorithm.BLS_BLS12_381
-				))
-			`, hex.EncodeToString(pks[i].Encode()))
+						pks.append(PublicKey(
+							publicKey: "%s".decodeHex(), 
+							signatureAlgorithm: SignatureAlgorithm.BLS_BLS12_381
+						))
+					`, hex.EncodeToString(pks[i].Encode()))
 	}
 
 	body := fmt.Sprintf(`
@@ -889,10 +777,8 @@ var AggregateBLSAggregateKeysTransaction = func(numSigs int) *SimpleTransaction 
 	`, pkString)
 
 	return NewSimpleTransaction(
-		"Aggregate BLS aggregate keys",
-		"BLSAggKey",
-	).
-		SetPrepareBlock(body)
+		body,
+	)
 }
 
 var BLSVerifySignatureTransaction = func(numSigs int, pks []crypto2.PublicKey, signatures []string) *SimpleTransaction {
@@ -908,34 +794,32 @@ var BLSVerifySignatureTransaction = func(numSigs int, pks []crypto2.PublicKey, s
 	pkString := ""
 	for i := 0; i < numSigs; i++ {
 		pkString += fmt.Sprintf(`
-								pks.append(PublicKey(
-									publicKey: "%s".decodeHex(), 
-									signatureAlgorithm: SignatureAlgorithm.BLS_BLS12_381
-								))
-							`, hex.EncodeToString(pks[i].Encode()))
+						pks.append(PublicKey(
+							publicKey: "%s".decodeHex(), 
+							signatureAlgorithm: SignatureAlgorithm.BLS_BLS12_381
+						))
+					`, hex.EncodeToString(pks[i].Encode()))
 	}
 
 	body := fmt.Sprintf(`
-						var pks: [PublicKey] = []
-                        var signatures: [[UInt8]] = []
-                        %s
-						%s
-						let aggPk = BLS.aggregatePublicKeys(pks)!
-                        let aggSignature = BLS.aggregateSignatures(signatures)!
-						let boo = aggPk.verify(
-									signature: aggSignature, 
-									signedData: "%s".decodeHex(),
-									domainSeparationTag: "random_tag", 
-									hashAlgorithm: HashAlgorithm.KMAC128_BLS_BLS12_381)
-						if !boo {
-							panic("invalid signature")
-						}
-					`, pkString, signaturesString, hex.EncodeToString(message))
+				var pks: [PublicKey] = []
+				var signatures: [[UInt8]] = []
+				%s
+				%s
+				let aggPk = BLS.aggregatePublicKeys(pks)!
+				let aggSignature = BLS.aggregateSignatures(signatures)!
+				let boo = aggPk.verify(
+							signature: aggSignature, 
+							signedData: "%s".decodeHex(),
+							domainSeparationTag: "random_tag", 
+							hashAlgorithm: HashAlgorithm.KMAC128_BLS_BLS12_381)
+				if !boo {
+					panic("invalid signature")
+				}
+			`, pkString, signaturesString, hex.EncodeToString(message))
 	return NewSimpleTransaction(
-		"BLS verify signature",
-		"BLSVerSig",
-	).
-		SetPrepareBlock(body)
+		body,
+	)
 }
 
 var BLSVerifyProofOfPossessionTransaction = func(loopLength uint64) *SimpleTransaction {
@@ -974,8 +858,6 @@ var BLSVerifyProofOfPossessionTransaction = func(loopLength uint64) *SimpleTrans
 							}`))
 
 	return NewSimpleTransaction(
-		"BLS verify proof of possession",
-		"BLSVerPoP",
-	).
-		SetPrepareBlock(body)
+		body,
+	)
 }

@@ -5,9 +5,6 @@ import "strings"
 type Label = string
 
 type Transaction interface {
-	Name() string
-	Label() Label
-
 	SetPrepareBlock(prepareBlock string) *SimpleTransaction
 	SetExecuteBlock(executeBlock string) *SimpleTransaction
 	SetFieldDeclarations(fieldDeclarations string) *SimpleTransaction

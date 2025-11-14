@@ -5,9 +5,6 @@ import (
 )
 
 type SimpleTransaction struct {
-	name  string
-	label Label
-
 	prepareBlock      string
 	executeBlock      string
 	fieldDeclarations string
@@ -16,21 +13,11 @@ type SimpleTransaction struct {
 var _ Transaction = (*SimpleTransaction)(nil)
 
 func NewSimpleTransaction(
-	name string,
-	label Label,
+	prepareBlock string,
 ) *SimpleTransaction {
 	return &SimpleTransaction{
-		name:  name,
-		label: label,
+		prepareBlock: prepareBlock,
 	}
-}
-
-func (s *SimpleTransaction) Name() string {
-	return s.name
-}
-
-func (s *SimpleTransaction) Label() Label {
-	return s.label
 }
 
 func (s *SimpleTransaction) SetPrepareBlock(
