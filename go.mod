@@ -1,4 +1,4 @@
-module github.com/onflow/flow-standard-transactions
+module github.com/onflow/cadence-standard-transactions
 
 go 1.25.0
 
