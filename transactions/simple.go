@@ -679,7 +679,7 @@ var ArrayCreateBatchTransaction = func(loopLength uint64) *SimpleTransaction {
 	)
 }
 
-var VerifySignatureTransaction = func(numKeys uint64, message []byte, rawKeys []string, signers []crypto.Signer, signatures []string) *SimpleTransaction {
+var VerifySignatureTransaction = func(numKeys uint64, message []byte, rawKeys []string, signatures []string) *SimpleTransaction {
 	keyListAdd := ""
 	for i := 0; i < int(numKeys); i++ {
 		keyListAdd += fmt.Sprintf(`
@@ -800,9 +800,7 @@ var AggregateBLSAggregateKeysTransaction = func(numSigs int) (*SimpleTransaction
 	), nil
 }
 
-var BLSVerifySignatureTransaction = func(numSigs int, pks []crypto2.PublicKey, signatures []crypto2.Signature) *SimpleTransaction {
-	message := []byte("random_message")
-
+var BLSVerifySignatureTransaction = func(numSigs int, pks []crypto2.PublicKey, signatures []crypto2.Signature, message []byte) *SimpleTransaction {
 	signaturesString := ""
 	for i := 0; i < numSigs; i++ {
 		signaturesString += fmt.Sprintf(`
