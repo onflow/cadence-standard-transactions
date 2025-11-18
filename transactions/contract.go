@@ -6,7 +6,9 @@ import (
 )
 
 // CONTRACT TRANSACTIONS
-// see contract.cdc for the contract code
+
+//go:embed contract.cdc
+var TestContractCode []byte
 
 var CallEmptyContractFunctionTransaction = func(
 	loopLength uint64,
