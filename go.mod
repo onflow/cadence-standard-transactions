@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/onflow/crypto v0.25.3
-	github.com/onflow/flow-go-sdk v1.9.3
+	github.com/onflow/flow-go-sdk v1.9.1
 )
 
 require (
