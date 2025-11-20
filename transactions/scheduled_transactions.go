@@ -66,7 +66,8 @@ var ScheduledTransactionAndExecuteWithLargeArrayTransaction = func(loopLength ui
 			let largeArray: [Int] = []
 			while largeArray.length < %d {
 				largeArray.append(1)
-
+			}
+				
 			let fees <- vault.withdraw(amount: 0.01) as! @FlowToken.Vault
 			let timestamp = getCurrentBlock().timestamp + 120.0 // 2 minutes in future
 			let effort: UInt64 = 100
