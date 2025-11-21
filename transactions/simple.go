@@ -144,7 +144,6 @@ var ConcatenateStringTransaction = func(loopLength uint64) *SimpleTransaction {
 	)
 }
 
-// needs a string in storage
 var BorrowStringTransaction = NewSimpleTransaction(
 	`
 		let strings = signer.storage.borrow<&[String]>(from: /storage/ABrSt)!
@@ -155,7 +154,11 @@ var BorrowStringTransaction = NewSimpleTransaction(
 			i = i + 1
 		}
 	`,
-)
+).WithSetupTemplate(`
+	signer.storage.load<[String]>(from: /storage/ABrSt)
+	let strings: [String] = %s
+	signer.storage.save<[String]>(strings, to: /storage/ABrSt)
+`)
 
 var CopyStringTransaction = NewSimpleTransaction(
 	`
@@ -167,7 +170,11 @@ var CopyStringTransaction = NewSimpleTransaction(
 			i = i + 1
 		}
 	`,
-)
+).WithSetupTemplate(`
+	signer.storage.load<[String]>(from: /storage/ACpSt)
+	let strings: [String] = %s
+	signer.storage.save<[String]>(strings, to: /storage/ACpSt)
+`)
 
 var CopyStringAndSaveADuplicateTransaction = NewSimpleTransaction(
 	`
@@ -180,7 +187,12 @@ var CopyStringAndSaveADuplicateTransaction = NewSimpleTransaction(
 		}
 		signer.storage.save(strings, to: /storage/ACpStSv2)
 	`,
-)
+).WithSetupTemplate(`
+	signer.storage.load<[String]>(from: /storage/ACpStSv)
+	signer.storage.load<[String]>(from: /storage/ACpStSv2)
+	let strings: [String] = %s
+	signer.storage.save<[String]>(strings, to: /storage/ACpStSv)
+`)
 
 var StoreAndLoadDictStringTransaction = func(dictLen uint64) *SimpleTransaction {
 	return NewSimpleTransaction(
@@ -201,7 +213,11 @@ var StoreLoadAndDestroyDictStringTransaction = NewSimpleTransaction(
 			strings.remove(key: key)
 		}
 	`,
-)
+).WithSetupTemplate(`
+	signer.storage.load<{String: String}>(from: /storage/ALdDStD)
+	let strings: {String: String} = %s
+	signer.storage.save<{String: String}>(strings, to: /storage/ALdDStD)
+`)
 
 var BorrowDictStringTransaction = NewSimpleTransaction(
 	`
@@ -212,7 +228,11 @@ var BorrowDictStringTransaction = NewSimpleTransaction(
 			return true
 		})
 	`,
-)
+).WithSetupTemplate(`
+	signer.storage.load<{String: String}>(from: /storage/ABrDSt)
+	let strings: {String: String} = %s
+	signer.storage.save<{String: String}>(strings, to: /storage/ABrDSt)
+`)
 
 var CopyDictStringTransaction = NewSimpleTransaction(
 	`
@@ -223,7 +243,11 @@ var CopyDictStringTransaction = NewSimpleTransaction(
 			return true
 		})
 	`,
-)
+).WithSetupTemplate(`
+	signer.storage.load<{String: String}>(from: /storage/ACpDSt)
+	let strings: {String: String} = %s
+	signer.storage.save<{String: String}>(strings, to: /storage/ACpDSt)
+`)
 
 var CopyDictStringAndSaveADuplicateTransaction = NewSimpleTransaction(
 	`
@@ -235,14 +259,31 @@ var CopyDictStringAndSaveADuplicateTransaction = NewSimpleTransaction(
 		})
 		signer.storage.save(strings, to: /storage/ACpDStSv2)
 	`,
-)
+).WithSetupTemplate(`
+	signer.storage.load<{String: String}>(from: /storage/ACpDStSv)
+	signer.storage.load<{String: String}>(from: /storage/ACpDStSv2)
+	let strings: {String: String} = %s
+	signer.storage.save(strings, to: /storage/ACpDStSv)
+`)
 
 var LoadDictAndDestroyItTransaction = NewSimpleTransaction(
 	`
 		let r <- signer.storage.load<@{String: AnyResource}>(from: /storage/DestDict)!
 		destroy r
 	`,
-)
+).WithSetupTemplate(`
+	let r <- signer.storage.load<@{String: AnyResource}>(from: /storage/DestDict)
+	destroy r
+	let r2: @{String: AnyResource} <- {}
+	var i = 0
+	while (i < %d) {
+		i = i + 1
+		let d: @{String: AnyResource} <- {}
+		r2[i.toString()] <-! d
+	}
+
+	signer.storage.save<@{String: AnyResource}>( <- r2, to: /storage/DestDict)
+`)
 
 var AddKeyToAccountTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
@@ -294,7 +335,16 @@ var GetContractsTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
 		loopLength,
 		`signer.contracts.names`,
-	)
+	).WithSetupTemplate(`
+		var c = signer.contracts.names.length
+		while c < 20 {
+			// deploy contract
+			let contractName = "TestContract".concat(c.toString())
+			let contractCode = "access(all) contract ".concat(contractName).concat(" {}")
+			signer.contracts.add(name: contractName, code: contractCode.utf8)
+			c = c + 1
+		}
+	`)
 }
 
 var HashTransaction = func(loopLength uint64) *SimpleTransaction {

@@ -8,6 +8,7 @@ type SimpleTransaction struct {
 	prepareBlock      string
 	executeBlock      string
 	fieldDeclarations string
+	setupTemplate     string
 }
 
 var _ Transaction = (*SimpleTransaction)(nil)
@@ -51,6 +52,15 @@ func (s *SimpleTransaction) GetExecuteBlock() string {
 
 func (s *SimpleTransaction) GetFieldDeclarations() string {
 	return s.fieldDeclarations
+}
+
+func (s *SimpleTransaction) WithSetupTemplate(setup string) *SimpleTransaction {
+	s.setupTemplate = setup
+	return s
+}
+
+func (s *SimpleTransaction) GetSetupTemplate() string {
+	return s.setupTemplate
 }
 
 func LoopTemplate(

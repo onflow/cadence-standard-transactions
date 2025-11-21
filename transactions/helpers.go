@@ -13,6 +13,21 @@ func stringOfLen(length uint64) string {
 	return string(someString)
 }
 
+func stringArrayOfLen(arrayLen uint64, stringLen uint64) string {
+	builder := strings.Builder{}
+	builder.WriteRune('[')
+	for i := uint64(0); i < arrayLen; i++ {
+		if i > 0 {
+			builder.WriteRune(',')
+		}
+		builder.WriteRune('"')
+		builder.WriteString(stringOfLen(stringLen))
+		builder.WriteRune('"')
+	}
+	builder.WriteRune(']')
+	return builder.String()
+}
+
 func stringDictOfLen(dictLen uint64, stringLen uint64) string {
 	builder := strings.Builder{}
 	builder.WriteRune('{')
