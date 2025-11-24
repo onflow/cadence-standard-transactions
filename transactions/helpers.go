@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func stringOfLen(length uint64) string {
+func StringOfLen(length uint64) string {
 	someString := make([]byte, length)
 	for i := 0; i < len(someString); i++ {
 		someString[i] = 'x'
@@ -13,7 +13,7 @@ func stringOfLen(length uint64) string {
 	return string(someString)
 }
 
-func stringArrayOfLen(arrayLen uint64, stringLen uint64) string {
+func StringArrayOfLen(arrayLen uint64, stringLen uint64) string {
 	builder := strings.Builder{}
 	builder.WriteRune('[')
 	for i := uint64(0); i < arrayLen; i++ {
@@ -21,14 +21,14 @@ func stringArrayOfLen(arrayLen uint64, stringLen uint64) string {
 			builder.WriteRune(',')
 		}
 		builder.WriteRune('"')
-		builder.WriteString(stringOfLen(stringLen))
+		builder.WriteString(StringOfLen(stringLen))
 		builder.WriteRune('"')
 	}
 	builder.WriteRune(']')
 	return builder.String()
 }
 
-func stringDictOfLen(dictLen uint64, stringLen uint64) string {
+func StringDictOfLen(dictLen uint64, stringLen uint64) string {
 	builder := strings.Builder{}
 	builder.WriteRune('{')
 	for i := uint64(0); i < dictLen; i++ {

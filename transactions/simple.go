@@ -201,7 +201,7 @@ var StoreAndLoadDictStringTransaction = func(dictLen uint64) *SimpleTransaction 
 				signer.storage.save<{String: String}>(%s, to: /storage/AStDSt)
 				signer.storage.load<{String: String}>(from: /storage/AStDSt)
 			`,
-			stringDictOfLen(dictLen, 75),
+			StringDictOfLen(dictLen, 75),
 		),
 	)
 }
@@ -360,7 +360,7 @@ var StringToLowerTransaction = func(loopLength uint64, stringLen uint64) *Simple
 		fmt.Sprintf(`
 			var s = "%s"
 			s = s.toLower()
-		`, stringOfLen(stringLen)),
+		`, StringOfLen(stringLen)),
 	)
 }
 

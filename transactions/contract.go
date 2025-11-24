@@ -44,6 +44,6 @@ var EmitEventWithStringTransaction = func(
 		fmt.Sprintf(`
 			let dict: {String: String} = %s
 			TestContract.emitDictEvent(dict)
-		`, stringDictOfLen(dictLen, 50)),
+		`, StringDictOfLen(dictLen, 50)),
 	)
 }
