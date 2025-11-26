@@ -14,11 +14,6 @@ type Transaction interface {
 	GetFieldDeclarations() string
 }
 
-type Registry interface {
-	Get(label Label) (Transaction, error)
-	AllLabels() []Label
-}
-
 func TrimAndReplaceIndentation(s string, indentation int) string {
 	// convert all tabs to spaces
 	s = strings.ReplaceAll(s, "\t", "    ")
