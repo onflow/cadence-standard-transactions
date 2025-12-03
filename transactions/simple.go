@@ -772,12 +772,22 @@ var AggregateBLSAggregateSignatureTransaction = func(numSigs int, sigs []crypto2
 	)
 }
 
-var AggregateBLSAggregateKeysTransaction = func(numSigs int, publicKeyString string) *SimpleTransaction {
+var AggregateBLSAggregateKeysTransaction = func(numSigs int, publicKeys []string) *SimpleTransaction {
+	pkString := ""
+	for i := 0; i < numSigs; i++ {
+		pkString += fmt.Sprintf(`
+						pks.append(PublicKey(
+							publicKey: "%s".decodeHex(), 
+							signatureAlgorithm: SignatureAlgorithm.BLS_BLS12_381
+						))
+					`, publicKeys[i])
+	}
+
 	body := fmt.Sprintf(`
 		let pks: [PublicKey] = []
 		%s
 		BLS.aggregatePublicKeys(pks)!.publicKey
-	`, publicKeyString)
+	`, pkString)
 
 	return NewSimpleTransaction(
 		body,
