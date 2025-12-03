@@ -834,7 +834,7 @@ var BLSVerifySignatureTransaction = func(numSigs int, pks []crypto2.PublicKey, s
 	)
 }
 
-var BLSVerifyProofOfPossessionTransaction = func(loopLength uint64, publicKeyString string, proofString string) (*SimpleTransaction, error) {
+var BLSVerifyProofOfPossessionTransaction = func(loopLength uint64, publicKeyString string, proofString string) *SimpleTransaction {
 
 	body := fmt.Sprintf(`
 			let p = PublicKey(
@@ -860,5 +860,5 @@ var BLSVerifyProofOfPossessionTransaction = func(loopLength uint64, publicKeyStr
 
 	return NewSimpleTransaction(
 		body,
-	), nil
+	)
 }
