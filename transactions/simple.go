@@ -1,12 +1,10 @@
 package transactions
 
 import (
-	"crypto/rand"
 	"encoding/hex"
 	"fmt"
 
 	crypto2 "github.com/onflow/crypto"
-	"github.com/onflow/flow-go-sdk/crypto"
 )
 
 // for end users, there is a bunch of constructor functions which each represent a simple template
@@ -436,17 +434,7 @@ var GetKeyCountTransaction = func(loopLength uint64) *SimpleTransaction {
 	)
 }
 
-var CreateKeyECDSAP256Transaction = func(loopLength uint64) (*SimpleTransaction, error) {
-	seed := make([]byte, crypto.MinSeedLength)
-	for i := range seed {
-		seed[i] = 0
-	}
-	privateKey, err := crypto.GeneratePrivateKey(crypto.ECDSA_P256, seed)
-	if err != nil {
-		return nil, err
-	}
-	key := hex.EncodeToString(privateKey.PublicKey().Encode())
-
+var CreateKeyECDSAP256Transaction = func(loopLength uint64, key string) *SimpleTransaction {
 	body := fmt.Sprintf(`
 			let publicKey = PublicKey(
 			publicKey: "%s".decodeHex(),
@@ -457,21 +445,10 @@ var CreateKeyECDSAP256Transaction = func(loopLength uint64) (*SimpleTransaction,
 	return simpleTransactionWithLoop(
 		loopLength,
 		body,
-	), nil
+	)
 }
 
-var CreateKeyECDSAsecp256k1Transaction = func(loopLength uint64) (*SimpleTransaction, error) {
-	seed := make([]byte, crypto.MinSeedLength)
-	for i := range seed {
-		seed[i] = 0
-	}
-
-	privateKey, err := crypto.GeneratePrivateKey(crypto.ECDSA_secp256k1, seed)
-	if err != nil {
-		return nil, err
-	}
-	key := hex.EncodeToString(privateKey.PublicKey().Encode())
-
+var CreateKeyECDSAsecp256k1Transaction = func(loopLength uint64, key string) *SimpleTransaction {
 	body := fmt.Sprintf(`
 				let publicKey = PublicKey(
 					publicKey: "%s".decodeHex(),
@@ -482,21 +459,10 @@ var CreateKeyECDSAsecp256k1Transaction = func(loopLength uint64) (*SimpleTransac
 	return simpleTransactionWithLoop(
 		loopLength,
 		body,
-	), nil
+	)
 }
 
-var CreateKeyBLSBLS12381Transaction = func(loopLength uint64) (*SimpleTransaction, error) {
-	seed := make([]byte, crypto.MinSeedLength)
-	for i := range seed {
-		seed[i] = 0
-	}
-
-	privateKey, err := crypto.GeneratePrivateKey(crypto.BLS_BLS12_381, seed)
-	if err != nil {
-		return nil, err
-	}
-	key := hex.EncodeToString(privateKey.PublicKey().Encode())
-
+var CreateKeyBLSBLS12381Transaction = func(loopLength uint64, key string) *SimpleTransaction {
 	body := fmt.Sprintf(`
 				let publicKey = PublicKey(
 					publicKey: "%s".decodeHex(),
@@ -507,7 +473,7 @@ var CreateKeyBLSBLS12381Transaction = func(loopLength uint64) (*SimpleTransactio
 	return simpleTransactionWithLoop(
 		loopLength,
 		body,
-	), nil
+	)
 }
 
 var ArrayInsertTransaction = func(loopLength uint64) *SimpleTransaction {
@@ -806,48 +772,16 @@ var AggregateBLSAggregateSignatureTransaction = func(numSigs int, sigs []crypto2
 	)
 }
 
-var AggregateBLSAggregateKeysTransaction = func(numSigs int) (*SimpleTransaction, error) {
-	pks := make([]crypto2.PublicKey, 0, numSigs)
-	signatureAlgorithm := crypto2.BLSBLS12381
-	input := make([]byte, 100)
-	_, err := rand.Read(input)
-	if err != nil {
-		return nil, err
-	}
-
-	for i := 0; i < numSigs; i++ {
-		seed := make([]byte, crypto2.KeyGenSeedMinLen)
-		_, err := rand.Read(seed)
-		if err != nil {
-			return nil, err
-		}
-		sk, err := crypto.GeneratePrivateKey(signatureAlgorithm, seed)
-		if err != nil {
-			return nil, err
-		}
-
-		pks = append(pks, sk.PublicKey())
-	}
-
-	pkString := ""
-	for i := 0; i < numSigs; i++ {
-		pkString += fmt.Sprintf(`
-						pks.append(PublicKey(
-							publicKey: "%s".decodeHex(), 
-							signatureAlgorithm: SignatureAlgorithm.BLS_BLS12_381
-						))
-					`, hex.EncodeToString(pks[i].Encode()))
-	}
-
+var AggregateBLSAggregateKeysTransaction = func(numSigs int, publicKeyString string) *SimpleTransaction {
 	body := fmt.Sprintf(`
 		let pks: [PublicKey] = []
 		%s
 		BLS.aggregatePublicKeys(pks)!.publicKey
-	`, pkString)
+	`, publicKeyString)
 
 	return NewSimpleTransaction(
 		body,
-	), nil
+	)
 }
 
 var BLSVerifySignatureTransaction = func(numSigs int, pks []crypto2.PublicKey, signatures []crypto2.Signature, message []byte) *SimpleTransaction {
@@ -890,23 +824,7 @@ var BLSVerifySignatureTransaction = func(numSigs int, pks []crypto2.PublicKey, s
 	)
 }
 
-var BLSVerifyProofOfPossessionTransaction = func(loopLength uint64) (*SimpleTransaction, error) {
-	signatureAlgorithm := crypto2.BLSBLS12381
-	seed := make([]byte, crypto2.KeyGenSeedMinLen)
-	_, err := rand.Read(seed)
-	if err != nil {
-		return nil, err
-	}
-	sk, err := crypto.GeneratePrivateKey(signatureAlgorithm, seed)
-	if err != nil {
-		return nil, err
-	}
-	pk := sk.PublicKey()
-
-	proof, err := crypto2.BLSGeneratePOP(sk)
-	if err != nil {
-		return nil, err
-	}
+var BLSVerifyProofOfPossessionTransaction = func(loopLength uint64, publicKeyString string, proofString string) (*SimpleTransaction, error) {
 
 	body := fmt.Sprintf(`
 			let p = PublicKey(
@@ -917,8 +835,8 @@ var BLSVerifyProofOfPossessionTransaction = func(loopLength uint64) (*SimpleTran
 
 			%s
 		`,
-		hex.EncodeToString(pk.Encode()),
-		hex.EncodeToString(proof.Bytes()),
+		publicKeyString,
+		proofString,
 		LoopTemplate(
 			loopLength,
 			`
