@@ -352,6 +352,127 @@ var HashTransaction = func(loopLength uint64) *SimpleTransaction {
 	)
 }
 
+var HashChainTransaction = func(loopLength uint64) *SimpleTransaction {
+	body := fmt.Sprintf(`
+				var data: [UInt8] = [1, 2, 3, 4, 5, 6, 7, 8]
+				%s
+			`,
+		LoopTemplate(
+			loopLength,
+			`
+					data = HashAlgorithm.SHA2_256.hash(data)
+					data = HashAlgorithm.SHA2_256.hash(data)
+					data = HashAlgorithm.SHA2_256.hash(data)
+					data = HashAlgorithm.SHA2_256.hash(data)
+					data = HashAlgorithm.SHA2_256.hash(data)
+				`,
+		),
+	)
+
+	return NewSimpleTransaction(body)
+}
+
+var HashSHA3Transaction = func(loopLength uint64) *SimpleTransaction {
+	return simpleTransactionWithLoop(
+		loopLength,
+		fmt.Sprintf(`HashAlgorithm.SHA3_256.hash("%s".utf8)`, StringOfLen(32)),
+	)
+}
+
+var HashKeccakTransaction = func(loopLength uint64) *SimpleTransaction {
+	return simpleTransactionWithLoop(
+		loopLength,
+		fmt.Sprintf(`HashAlgorithm.KECCAK_256.hash("%s".utf8)`, StringOfLen(32)),
+	)
+}
+
+var DirectVerifyP256Transaction = func(loopLength uint64, rawKey string, sig string, message []byte) *SimpleTransaction {
+	body := fmt.Sprintf(`
+				let pk = PublicKey(
+					publicKey: "%s".decodeHex(),
+					signatureAlgorithm: SignatureAlgorithm.ECDSA_P256
+				)
+				let sig = "%s".decodeHex()
+				let msg = "%s".decodeHex()
+				%s
+			`,
+		rawKey,
+		sig,
+		hex.EncodeToString(message),
+		LoopTemplate(
+			loopLength,
+			`
+					pk.verify(
+						signature: sig,
+						signedData: msg,
+						domainSeparationTag: "FLOW-V0.0-user",
+						hashAlgorithm: HashAlgorithm.SHA2_256
+					)
+				`,
+		),
+	)
+
+	return NewSimpleTransaction(body)
+}
+
+var DirectVerifySecp256k1Transaction = func(loopLength uint64, rawKey string, sig string, message []byte) *SimpleTransaction {
+	body := fmt.Sprintf(`
+				let pk = PublicKey(
+					publicKey: "%s".decodeHex(),
+					signatureAlgorithm: SignatureAlgorithm.ECDSA_secp256k1
+				)
+				let sig = "%s".decodeHex()
+				let msg = "%s".decodeHex()
+				%s
+			`,
+		rawKey,
+		sig,
+		hex.EncodeToString(message),
+		LoopTemplate(
+			loopLength,
+			`
+					pk.verify(
+						signature: sig,
+						signedData: msg,
+						domainSeparationTag: "FLOW-V0.0-user",
+						hashAlgorithm: HashAlgorithm.SHA2_256
+					)
+				`,
+		),
+	)
+
+	return NewSimpleTransaction(body)
+}
+
+var DirectVerifyBLSTransaction = func(loopLength uint64, rawKey string, sig string, message []byte) *SimpleTransaction {
+	body := fmt.Sprintf(`
+				let pk = PublicKey(
+					publicKey: "%s".decodeHex(),
+					signatureAlgorithm: SignatureAlgorithm.BLS_BLS12_381
+				)
+				let sig = "%s".decodeHex()
+				let msg = "%s".decodeHex()
+				%s
+			`,
+		rawKey,
+		sig,
+		hex.EncodeToString(message),
+		LoopTemplate(
+			loopLength,
+			`
+					pk.verify(
+						signature: sig,
+						signedData: msg,
+						domainSeparationTag: "random_tag",
+						hashAlgorithm: HashAlgorithm.KMAC128_BLS_BLS12_381
+					)
+				`,
+		),
+	)
+
+	return NewSimpleTransaction(body)
+}
+
 var StringToLowerTransaction = func(loopLength uint64, stringLen uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
 		loopLength,
