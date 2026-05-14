@@ -60,3 +60,12 @@ func simpleTransactionWithLoop(
 		LoopTemplate(initialLoopLength, body),
 	)
 }
+
+func simpleTransactionWithInt64Loop(
+	initialLoopLength uint64,
+	body string,
+) *SimpleTransaction {
+	return NewSimpleTransaction(
+		LoopInt64Template(initialLoopLength, body),
+	)
+}
