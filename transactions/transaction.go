@@ -74,3 +74,18 @@ func LoopTemplate(
 					%s
 				}`, n, body)
 }
+
+// LoopInt64Template is the Int64-counter sibling of LoopTemplate. Int64 arithmetic
+// does not meter ComputationKindWordSliceOperation (only unbounded Int/UInt does),
+// letting calibration templates sit off the (Statement, WSO) line of LoopTemplate.
+func LoopInt64Template(
+	n uint64,
+	body string,
+) string {
+	return fmt.Sprintf(`
+				var i: Int64 = 0
+				while i < %d {
+					i = i + 1
+					%s
+				}`, n, body)
+}

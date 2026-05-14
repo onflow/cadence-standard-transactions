@@ -3,6 +3,7 @@ package transactions
 import (
 	"encoding/hex"
 	"fmt"
+	"strings"
 
 	crypto2 "github.com/onflow/crypto"
 )
@@ -16,6 +17,54 @@ var EmptyLoopTransaction = func(loopLength uint64) *SimpleTransaction {
 		loopLength,
 		"",
 	)
+}
+
+// ArraySubscriptReadSetupScript seeds /storage/calibrationArr with a 32-element
+// [UInt64]. Run once per account before ArraySubscriptReadTransaction.
+const ArraySubscriptReadSetupScript = `
+	if signer.storage.borrow<&[UInt64]>(from: /storage/calibrationArr) == nil {
+		var arr: [UInt64] = []
+		var k: UInt64 = 0
+		while k < 32 {
+			arr.append(k)
+			k = k + 1
+		}
+		signer.storage.save<[UInt64]>(arr, to: /storage/calibrationArr)
+	}
+`
+
+// ArraySubscriptReadTransaction subscript-reads element 0 of a pre-stored [UInt64].
+// Profile: high AtreeArrayGet; zero DestroyArrayValue, EVMGasUsage.
+// Requires ArraySubscriptReadSetupScript.
+var ArraySubscriptReadTransaction = func(loopLength uint64) *SimpleTransaction {
+	return simpleTransactionWithLoop(
+		loopLength,
+		`let arrRef = signer.storage.borrow<&[UInt64]>(from: /storage/calibrationArr)!
+				let _ = arrRef[0]`,
+	)
+}
+
+// EmptyLoopInt64Transaction is the Int64-counter sibling of EmptyLoopTransaction.
+// Profile: high Statement / zero WordSliceOperation (Int64 doesn't meter WSO).
+var EmptyLoopInt64Transaction = func(loopLength uint64) *SimpleTransaction {
+	return simpleTransactionWithInt64Loop(
+		loopLength,
+		"",
+	)
+}
+
+// BigIntAdditionChainTransaction adds a wide Int literal ~16x per iter in an Int64
+// loop. Profile: low Statement / high WordSliceOperation — counterpart to
+// EmptyLoopInt64Transaction.
+var BigIntAdditionChainTransaction = func(loopLength uint64) *SimpleTransaction {
+	// 100-digit literal → ~333 bits → ~6 big.Words on 64-bit platforms.
+	const bigLiteral = "1234567890123456789012345678901234567890" +
+		"1234567890123456789012345678901234567890" +
+		"12345678901234567890"
+	body := "let big: Int = " + bigLiteral + "\n" +
+		"\t\t\t\tlet _ = big + big + big + big + big + big + big + big" +
+		" + big + big + big + big + big + big + big + big"
+	return simpleTransactionWithInt64Loop(loopLength, body)
 }
 
 var AssertTrueTransaction = func(loopLength uint64) *SimpleTransaction {
@@ -118,6 +167,41 @@ var DecodeHexTransaction = func(loopLength uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
 		loopLength,
 		`"f847b84000fb479cb398ab7e31d6f048c12ec5b5b679052589280cacde421af823f93fe927dfc3d1e371b172f97ceeac1bc235f60654184c83f4ea70dd3b7785ffb3c73802038203e8".decodeHex()`,
+	)
+}
+
+// DecodeHexTinyTransaction calls "00".decodeHex() per iter. The 1-byte result goes
+// through AtreeArraySingleSlabConstruction, separating string_decode_hex from
+// atree_array_batch_construction (which the long-hex companion locks together).
+var DecodeHexTinyTransaction = func(loopLength uint64) *SimpleTransaction {
+	return simpleTransactionWithLoop(
+		loopLength,
+		`let _ = "00".decodeHex()`,
+	)
+}
+
+// SaveLoadEmptyArrayTransaction saves an empty [Int] and immediately loads it back.
+// Profile: high AllocateSlabIndex + AtreeArraySingleSlabConstruction + SetValue +
+// GetValue; zero AtreeMapSingleSlabConstruction — decorrelates allocate_slab_index
+// from atree_map_single_slab_construction (templates hitting either usually hit both
+// via save/load on single-slab dicts).
+var SaveLoadEmptyArrayTransaction = func(loopLength uint64) *SimpleTransaction {
+	return simpleTransactionWithLoop(
+		loopLength,
+		`signer.storage.save<[Int]>([], to: /storage/ArrSLASource)
+			signer.storage.load<[Int]>(from: /storage/ArrSLASource)`,
+	)
+}
+
+// DictMakeTransaction creates a single-entry in-memory dict per iter (no save/copy).
+// Profile: high CreateDictionaryValue + AllocateSlabIndex + DestroyDictionaryValue;
+// zero AtreeMapSingleSlabConstruction and zero storage-domain map ops — pairs with
+// SaveLoadEmptyArrayTransaction (array side) to decorrelate allocate_slab_index from
+// atree_map_single_slab_construction.
+var DictMakeTransaction = func(loopLength uint64) *SimpleTransaction {
+	return simpleTransactionWithLoop(
+		loopLength,
+		`let _: {String: Int} = {"a": 1}`,
 	)
 }
 
@@ -352,6 +436,127 @@ var HashTransaction = func(loopLength uint64) *SimpleTransaction {
 	)
 }
 
+var HashChainTransaction = func(loopLength uint64) *SimpleTransaction {
+	body := fmt.Sprintf(`
+				var data: [UInt8] = [1, 2, 3, 4, 5, 6, 7, 8]
+				%s
+			`,
+		LoopTemplate(
+			loopLength,
+			`
+					data = HashAlgorithm.SHA2_256.hash(data)
+					data = HashAlgorithm.SHA2_256.hash(data)
+					data = HashAlgorithm.SHA2_256.hash(data)
+					data = HashAlgorithm.SHA2_256.hash(data)
+					data = HashAlgorithm.SHA2_256.hash(data)
+				`,
+		),
+	)
+
+	return NewSimpleTransaction(body)
+}
+
+var HashSHA3Transaction = func(loopLength uint64) *SimpleTransaction {
+	return simpleTransactionWithLoop(
+		loopLength,
+		fmt.Sprintf(`HashAlgorithm.SHA3_256.hash("%s".utf8)`, StringOfLen(32)),
+	)
+}
+
+var HashKeccakTransaction = func(loopLength uint64) *SimpleTransaction {
+	return simpleTransactionWithLoop(
+		loopLength,
+		fmt.Sprintf(`HashAlgorithm.KECCAK_256.hash("%s".utf8)`, StringOfLen(32)),
+	)
+}
+
+var DirectVerifyP256Transaction = func(loopLength uint64, rawKey string, sig string, message []byte) *SimpleTransaction {
+	body := fmt.Sprintf(`
+				let pk = PublicKey(
+					publicKey: "%s".decodeHex(),
+					signatureAlgorithm: SignatureAlgorithm.ECDSA_P256
+				)
+				let sig = "%s".decodeHex()
+				let msg = "%s".decodeHex()
+				%s
+			`,
+		rawKey,
+		sig,
+		hex.EncodeToString(message),
+		LoopTemplate(
+			loopLength,
+			`
+					pk.verify(
+						signature: sig,
+						signedData: msg,
+						domainSeparationTag: "FLOW-V0.0-user",
+						hashAlgorithm: HashAlgorithm.SHA2_256
+					)
+				`,
+		),
+	)
+
+	return NewSimpleTransaction(body)
+}
+
+var DirectVerifySecp256k1Transaction = func(loopLength uint64, rawKey string, sig string, message []byte) *SimpleTransaction {
+	body := fmt.Sprintf(`
+				let pk = PublicKey(
+					publicKey: "%s".decodeHex(),
+					signatureAlgorithm: SignatureAlgorithm.ECDSA_secp256k1
+				)
+				let sig = "%s".decodeHex()
+				let msg = "%s".decodeHex()
+				%s
+			`,
+		rawKey,
+		sig,
+		hex.EncodeToString(message),
+		LoopTemplate(
+			loopLength,
+			`
+					pk.verify(
+						signature: sig,
+						signedData: msg,
+						domainSeparationTag: "FLOW-V0.0-user",
+						hashAlgorithm: HashAlgorithm.SHA2_256
+					)
+				`,
+		),
+	)
+
+	return NewSimpleTransaction(body)
+}
+
+var DirectVerifyBLSTransaction = func(loopLength uint64, rawKey string, sig string, message []byte) *SimpleTransaction {
+	body := fmt.Sprintf(`
+				let pk = PublicKey(
+					publicKey: "%s".decodeHex(),
+					signatureAlgorithm: SignatureAlgorithm.BLS_BLS12_381
+				)
+				let sig = "%s".decodeHex()
+				let msg = "%s".decodeHex()
+				%s
+			`,
+		rawKey,
+		sig,
+		hex.EncodeToString(message),
+		LoopTemplate(
+			loopLength,
+			`
+					pk.verify(
+						signature: sig,
+						signedData: msg,
+						domainSeparationTag: "random_tag",
+						hashAlgorithm: HashAlgorithm.KMAC128_BLS_BLS12_381
+					)
+				`,
+		),
+	)
+
+	return NewSimpleTransaction(body)
+}
+
 var StringToLowerTransaction = func(loopLength uint64, stringLen uint64) *SimpleTransaction {
 	return simpleTransactionWithLoop(
 		loopLength,
@@ -359,6 +564,56 @@ var StringToLowerTransaction = func(loopLength uint64, stringLen uint64) *Simple
 			var s = "%s"
 			s = s.toLower()
 		`, StringOfLen(stringLen)),
+	)
+}
+
+// StringComparisonTransaction compares two short literals per iter.
+// Profile: high StringComparison; zero GetValue / atree_*_construction —
+// decorrelates string_comparison from get_value.
+var StringComparisonTransaction = func(loopLength uint64) *SimpleTransaction {
+	return simpleTransactionWithLoop(
+		loopLength,
+		`let _ = "the quick brown fox" == "lorem ipsum dolor sit amet"`,
+	)
+}
+
+// StringComparisonLongTransaction compares two 500-char strings differing only on
+// the last byte — StringComparison intensity = minLen, so each iter fires ~500 units
+// (vs ~19 for the short variant). Trailing-mismatch is required; a first-byte
+// mismatch lets atree short-circuit. Pushes per-tx intensity high enough for NNLS
+// to recover the coefficient against storage-touching templates that absorb it
+// through get_value.
+var StringComparisonLongTransaction = func(loopLength uint64) *SimpleTransaction {
+	s := strings.Repeat("a", 500)
+	body := fmt.Sprintf(`let _ = "%s" == "%sZ"`, s, s[:499])
+	return simpleTransactionWithLoop(loopLength, body)
+}
+
+// ArrayLiteralStringTransaction constructs a 26-element [String] literal per iter.
+// Profile: high AtreeArrayBatchConstruction (intensity 26/iter); zero
+// AtreeArrayReadIteration, transfer/copy — decorrelates batch_construction from
+// read_iteration (other batch_construction templates go through the non-primitive
+// transfer path, which fires both 1:1).
+var ArrayLiteralStringTransaction = func(loopLength uint64) *SimpleTransaction {
+	return simpleTransactionWithLoop(
+		loopLength,
+		`let _: [String] = [
+			"a","b","c","d","e","f","g","h","i","j","k","l","m",
+			"n","o","p","q","r","s","t","u","v","w","x","y","z"
+		]`,
+	)
+}
+
+// LoadSaveStringArrayTransaction loads a stored 50-element [String] and re-saves it.
+// Profile: high AtreeArrayPopIteration without touching account.keys — decorrelates
+// pop_iteration from validate_public_key / add/revoke/get_account_key, which absorb
+// it in the migrationtestnet fit.
+var LoadSaveStringArrayTransaction = func(loopLength uint64) *SimpleTransaction {
+	return simpleTransactionWithLoop(
+		loopLength,
+		`let arr = signer.storage.load<[String]>(from: /storage/ArrPopSrc)
+			?? panic("ArrPop: source array not set up")
+		signer.storage.save(arr, to: /storage/ArrPopSrc)`,
 	)
 }
 
@@ -375,6 +630,19 @@ var GetBlockAtTransaction = func(loopLength uint64) *SimpleTransaction {
 		`let at = getCurrentBlock().height
 		getBlock(at: at)`,
 	)
+}
+
+// GetBlockAtCachedHeightTransaction calls getBlock(at:) N times against a
+// caller-resolved height. No getCurrentBlock() in the body, isolating
+// GetBlockAtHeight from GetCurrentBlockHeight.
+var GetBlockAtCachedHeightTransaction = func(loopLength, height uint64) *SimpleTransaction {
+	return NewSimpleTransaction(fmt.Sprintf(`
+		let h: UInt64 = %d
+		var i = 0
+		while i < %d {
+			i = i + 1
+			getBlock(at: h)
+		}`, height, loopLength))
 }
 
 var DestroyResourceDictionaryTransaction = func(loopLength uint64) *SimpleTransaction {

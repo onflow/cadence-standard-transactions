@@ -3,6 +3,7 @@ import "FlowTransactionScheduler"
 access(all) contract TestContract {
     access(all) var totalSupply: UInt64
     access(all) var nfts: @[NFT]
+    access(all) var items: @[Item]
 
     access(all) event SomeEvent()
     access(all) event SomeEvent2(d: {String:String})
@@ -39,6 +40,18 @@ access(all) contract TestContract {
         TestContract.totalSupply = TestContract.totalSupply + UInt64(1)
     }
 
+    access(all) resource Item {}
+
+    access(all) struct Empty {}
+
+    access(all) fun mintItem(): @Item {
+        return <- create Item()
+    }
+
+    access(all) fun mintItemAndStore() {
+        self.items.append(<- create Item())
+    }
+
     access(all) resource NFT {
         access(all) let id: UInt64
         access(all) let data: String
@@ -58,5 +71,6 @@ access(all) contract TestContract {
 
         self.totalSupply = 0
         self.nfts <- []
+        self.items <- []
     }
 }
